@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: mongo-config
 data:
-  MONGO_URL: "mongodb://mongo-user:mongo-pass@mongodb-service:27017/bookstoredb"
+  # The URL references the MongoDB service name defined above: mongodb-service
+  MONGO_URL: "mongodb://mongodb-service:27017/bookstoredb"
