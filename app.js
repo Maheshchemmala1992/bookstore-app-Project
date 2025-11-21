@@ -1,15 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors'); // CORS for cross-origin requests
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use(cors()); // Enable CORS for all routes
 
 // --- MongoDB Connection ---
 const connectionOptions = {
-    user: process.env.MONGO_USERNAME,
-    pass: process.env.MONGO_PASSWORD
+    user: process.env.MONGO_USERNAME,   // Ensure MONGO_USERNAME is correct
+    pass: process.env.MONGO_PASSWORD,   // Ensure MONGO_PASSWORD is correct
 };
 
 mongoose.connect(process.env.MONGO_URL, connectionOptions)
@@ -18,7 +20,10 @@ mongoose.connect(process.env.MONGO_URL, connectionOptions)
 
 // --- Schema & Model ---
 const BookSchema = new mongoose.Schema({
-    name: { type: String, required: true }
+    name: { 
+        type: String, 
+        required: [true, 'Book name is required'],  // Added validation message
+    }
 });
 
 const Book = mongoose.model("Book", BookSchema);
@@ -33,16 +38,23 @@ app.get('/books', async (req, res) => {
         const books = await Book.find();
         res.json(books);
     } catch (err) {
+        console.error("Error fetching books:", err);
         res.status(500).json({ message: "Failed to fetch books" });
     }
 });
 
 app.post('/books', async (req, res) => {
     try {
-        const newBook = new Book({ name: req.body.name });
+        const { name } = req.body;
+        if (!name) {
+            return res.status(400).json({ message: "Book name is required" });
+        }
+        
+        const newBook = new Book({ name });
         await newBook.save();
         res.status(201).json(newBook);
     } catch (err) {
+        console.error("Error adding book:", err);
         res.status(400).json({ message: "Failed to add book", error: err.message });
     }
 });
