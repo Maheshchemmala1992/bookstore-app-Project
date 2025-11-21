@@ -14,22 +14,25 @@ spec:
     spec:
       containers:
       - name: bookstore
-        image: maheshmaha/bookstore:v1
+        image: maheshmaha/bookstore:v1 # IMPORTANT: Remember to build and push your image first!
         ports:
         - containerPort: 3000
         env:
+        # 1. MONGO_URL from ConfigMap
         - name: MONGO_URL
           valueFrom:
             configMapKeyRef:
               name: mongo-config
               key: MONGO_URL
 
+        # 2. MONGO_USERNAME from Secret
         - name: MONGO_USERNAME
           valueFrom:
             secretKeyRef:
               name: mongo-secret
               key: MONGO_USERNAME
 
+        # 3. MONGO_PASSWORD from Secret
         - name: MONGO_PASSWORD
           valueFrom:
             secretKeyRef:
